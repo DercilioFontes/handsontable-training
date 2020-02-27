@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Handsontable Practice - Load and Save</title>
+    <script src="node_modules/jquery/dist/jquery.js"></script>
+    <script src="node_modules/handsontable/dist/handsontable.full.js"></script>
+    <link
+      href="node_modules/handsontable/dist/handsontable.full.css"
+      rel="stylesheet"
+      media="screen"
+    />
+  </head>
+  <body>
+    <button id="load" type="button">Load</button>
+    <button id="save" type="button">Save</button>
+    <div>
+      <input type="checkbox" name="autosave" id="autosave" />
+      <label for="autosave">Autosave</label>
+    </div>
+    <p id="exampleConsole"></p>
+    <div id="example1"></div>
+
+    <script>
+      const $$ = id => document.getElementById(id);
+      const container = $$("example1");
+      const exampleConsole = $$("exampleConsole");
+      const autoSave = $$("autosave");
+      const load = $$("load");
+      const save = $$("save");
+      let autoSaveNotification;
+
+      const hot = new Handsontable(container, {
+        licenseKey: "non-commercial-and-evaluation",
+        startRows: 8,
+        startCols: 6,
+        rowHeaders: true,
+        colHeaders: true,
+        afterChange: (changes, source) => {
+          if (source === "loadData") return; // don't save this change
+          if (!autoSave.checked) return;
+
+          clearTimeout(autoSaveNotification);
+
+          $.ajax(
+            "scripts/json/save.json",
+            "GET",
+            JSON.stringify({ data: changes }),
+            data => {
+              exampleConsole.innerText = `Autosaved (${changes.length} cell${
+                changes.length > 1 ? "s" : ""
+              })`;
+              autoSaveNotification = setTimeout(() => {
+                exampleConsole.innerText = "Changes will be autosaved";
+              }, 1000);
+            }
+          );
+        }
+      });
+
+      Handsontable.dom.addEvent(load, "click", () => {
+        $.ajax("scripts/json/load.json", "GET", "", res => {
+          const data = JSON.parse(res.response);
+          hot.loadData(data.data);
+          exampleConsole.innerText = "Data loaded";
+        });
+      });
+
+      Handsontable.dom.addEvent(save, "click", () => {
+        $.ajax(
+          "scripts/json/save.json",
+          "GET",
+          JSON.stringify({ data: hot.getData() }),
+          res => {
+            const response = JSON.parse(res.response);
+
+            if (response.result === "ok")
+              exampleConsole.innerText = "Data saved";
+            else exampleConsole.innerText = "Save error";
+          }
+        );
+      });
+
+      Handsontable.dom.addEvent(autoSave, "click", () => {
+        if (autoSave.checked)
+          exampleConsole.innerText = "Changes will be autosaved";
+        else exampleConsole.innerText = "Changes will not be autosaved";
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Handsontable Practice</title>
+    <script src="node_modules/handsontable/dist/handsontable.full.min.js"></script>
+    <!-- <script src="myApp.js"></script> -->
+    <link
+      href="node_modules/handsontable/dist/handsontable.full.min.css"
+      rel="stylesheet"
+      media="screen"
+    />
+  </head>
+  <body>
+    <div id="example1"></div>
+    <div><hr /></div>
+    <div id="example2"></div>
+    <div><hr /></div>
+    <div id="example3"></div>
+    <div><hr /></div>
+    <div id="example4"></div>
+    <div><hr /></div>
+    <div id="example5"></div>
+    <div><hr /></div>
+    <div id="example6"></div>
+
+    <script>
+      const data = [
+        ["", "Tesla", "Nissan", "Toyota", "Honda", "Mazda", "Ford"],
+        ["2017", 10, 11, 12, 13, 15, 16],
+        ["2018", 10, 11, 12, 13, 15, 16],
+        ["2019", 10, 11, 12, 13, 15, 16],
+        ["2020", 10, 11, 12, 13, 15, 16],
+        ["2021", 10, 11, 12, 13, 15, 16]
+      ];
+      const dataToUse = JSON.parse(JSON.stringify(data));
+      const container1 = document.getElementById("example1");
+      const hot1 = new Handsontable(container1, {
+        licenseKey: "non-commercial-and-evaluation",
+        data: dataToUse,
+        // rowHeaders: true,
+        colHeaders: true,
+        // dropdownMenu: true,
+        // filters: true,
+        startRows: 5,
+        startCols: 5,
+        minSpareRows: 1
+      });
+      // hot1.setDataAtCell(0, 1, "Ford");
+
+      const hiddenData = [
+        ["", "Tesla", "Nissan", "Toyota", "Honda", "Mazda", "Ford"],
+        ["2017", 10, 11, 12, 13, 15, 16],
+        ["2018", 10, 11, 12, 13, 15, 16],
+        ["2019", 10, 11, 12, 13, 15, 16],
+        ["2020", 10, 11, 12, 13, 15, 16],
+        ["2021", 10, 11, 12, 13, 15, 16]
+      ];
+      const container2 = document.getElementById("example2");
+      const hot2 = new Handsontable(container2, {
+        licenseKey: "non-commercial-and-evaluation",
+        data: hiddenData,
+        colHeaders: true,
+        minSpareRows: 1,
+        columns: [
+          { data: 0 },
+          { data: 2 },
+          { data: 3 },
+          { data: 4 },
+          // { data: 5 },
+          { data: 6 }
+        ]
+      });
+
+      const objectData = [
+        { id: 1, name: "Ted Right", address: "" },
+        { id: 2, name: "Frank Honest", address: "" },
+        { id: 3, name: "Joan Well", address: "" },
+        { id: 4, name: "Gail Polite", address: "" },
+        { id: 5, name: "Michael Fair", address: "" }
+      ];
+      const container3 = document.getElementById("example3");
+      const hot3 = new Handsontable(container3, {
+        licenseKey: "non-commercial-and-evaluation",
+        data: objectData,
+        colHeaders: true,
+        minSpareRows: 1
+      });
+
+      const nestedObject = [
+        { id: 1, name: { first: "Ted", last: "Right" }, address: "" },
+        { id: 2, address: "" }, // HOT will create missing properties on demand
+        { id: 3, name: { first: "Joan", last: "Well" }, address: "" }
+      ];
+      const container4 = document.getElementById("example4");
+      const hot4 = new Handsontable(container4, {
+        licenseKey: "non-commercial-and-evaluation",
+        data: nestedObject,
+        colHeaders: true,
+        columns: column => {
+          const columnMeta = {};
+
+          if (column === 0) columnMeta.data = "id";
+          else if (column === 1) columnMeta.data = "name.first";
+          else if (column === 2) columnMeta.data = "name.last";
+          else if (column === 3) columnMeta.data = "address";
+          else columnMeta = null;
+
+          return columnMeta;
+        },
+        minSpareRows: 1
+      });
+
+      const data5 = [];
+      const container5 = document.getElementById("example5");
+      const hot5 = new Handsontable(container5, {
+        licenseKey: "non-commercial-and-evaluation",
+        data: data5,
+        dataSchema: {
+          id: null,
+          name: { first: null, last: null },
+          address: null
+        },
+        startRows: 5,
+        startCols: 4,
+        colHeaders: ["ID", "First Name", "Last Name", "Address"],
+        columns: [
+          { data: "id" },
+          { data: "name.first" },
+          { data: "name.last" },
+          { data: "address" }
+        ],
+        minSpareRows: 1
+      });
+
+      const data6 = [
+        model({ id: 1, name: "Ted Right", address: "" }),
+        model({ id: 2, name: "Frank Honest", address: "" }),
+        model({ id: 3, name: "Joan Well", address: "" }),
+        model({ id: 4, name: "Gail Polite", address: "" }),
+        model({ id: 5, name: "Michael Fair", address: "" })
+      ];
+      const container6 = document.getElementById("example6");
+      const hot6 = new Handsontable(container6, {
+        licenseKey: "non-commercial-and-evaluation",
+        data: data6,
+        dataSchema: model,
+        startRows: 5,
+        startCols: 4,
+        colHeaders: ["ID", "Name", "Address"],
+        columns: [
+          { data: property("id") },
+          { data: property("name") },
+          { data: property("address") }
+        ],
+        minSpareRows: 1
+      });
+
+      function model(opts) {
+        const _pub = {};
+        const _priv = {
+          id: undefined,
+          name: undefined,
+          address: undefined
+        };
+
+        for (const key in opts) {
+          if (opts.hasOwnProperty(key)) {
+            _priv[key] = opts[key];
+          }
+        }
+
+        _pub.attr = (attr, val) => {
+          if (typeof val === "undefined") {
+            window.console && console.log("SET the ", attr, " value of ", _pub);
+            return _priv[attr];
+          }
+
+          window.console && console.log("SET the ", attr, " value of ", _pub);
+          _priv[attr] = val;
+
+          return _pub;
+        };
+
+        return _pub;
+      }
+
+      function property(attr) {
+        return (row, value) => row.attr(attr, value);
+      }
+    </script>
+  </body>
+</html>

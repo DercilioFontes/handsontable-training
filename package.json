@@ -1,0 +1,19 @@
+{
+  "name": "handsontable",
+  "version": "1.0.0",
+  "description": "",
+  "main": "myApp.js",
+  "dependencies": {
+    "ajax": "0.0.4",
+    "handsontable": "^7.3.0",
+    "http-server": "^0.12.1",
+    "jquery": "^3.4.1",
+    "underscore": "^1.9.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
